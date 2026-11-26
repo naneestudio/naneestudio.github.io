@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.naneestudio.waterdropgarden",
+    "sha256_cert_fingerprints": [
+      "6C:2A:B7:6F:C2:BD:24:0F:CB:58:26:F8:2C:01:3B:00:A3:A6:3F:8A:46:59:FD:2E:6F:DB:DC:25:E6:69:05:1B"
+    ]
+  }
+}]
