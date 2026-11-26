@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>물방울 정원 리플레이</title>
+<meta property="og:title" content="물방울 정원 · 친구의 리플레이">
+<meta property="og:description" content="눌러서 친구의 한 발을 물방울 정원에서 보세요.">
+<style>
+  :root { --bg:#eaf6ee; --card:#fffdf8; --ink:#2f4a3a; --sub:#6f8a7a; --pink:#ff6fa3; --line:#cfe6d6; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#16201a; --card:#1f2a23; --ink:#e3efe6; --sub:#9bb3a4; --line:#33473a; } }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Malgun Gothic","Noto Sans KR",sans-serif; line-height:1.6; }
+  main { max-width:420px; margin:0 auto; padding:32px 16px 48px; text-align:center; }
+  .card { background:var(--card); border-radius:20px; padding:24px 18px; box-shadow:0 4px 18px rgba(40,90,60,.12); }
+  h1 { font-size:1.4rem; margin:6px 0 2px; }
+  .emo { font-size:48px; }
+  p { margin:8px 0; color:var(--sub); font-size:.95rem; }
+  .btn { display:block; width:100%; box-sizing:border-box; border:0; border-radius:14px; padding:14px; font-size:1.05rem; font-weight:800; margin-top:10px; text-decoration:none; cursor:pointer; font-family:inherit; }
+  .main { background:var(--pink); color:#fff; }
+  .sub { background:transparent; color:var(--ink); border:2px solid var(--line); }
+  code { display:block; word-break:break-all; font-size:.75rem; background:var(--bg); border-radius:10px; padding:8px; margin-top:12px; color:var(--sub); }
+  .foot { margin-top:20px; font-size:.8rem; }
+  .foot a { color:var(--sub); }
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <div class="emo">💧🌸</div>
+    <h1 id="title">물방울 정원 리플레이</h1>
+    <p id="desc">친구가 보낸 한 발을 앱에서 볼 수 있어요.</p>
+    <a class="btn main" id="open" href="#">앱에서 보기</a>
+    <button class="btn sub" id="copy">코드 복사하기</button>
+    <p id="help" style="font-size:.85rem">앱이 열리지 않으면 코드를 복사한 뒤 물방울 정원을 열어 보세요. 복사해 둔 코드를 앱이 알아서 찾아요.</p>
+    <code id="code"></code>
+  </div>
+  <p class="foot"><a href="../privacy/">개인정보처리방침</a> · 나늬 스튜디오</p>
+</main>
+<script>
+// 리플레이 코드는 주소의 # 뒤에 있어서 서버로 보내지지 않는다
+const PKG = 'com.naneestudio.waterdropgarden';
+const STORE = 'https://play.google.com/store/apps/details?id=' + PKG;
+const m = decodeURIComponent(location.hash || '').match(/WG\d+\.[A-Za-z0-9_-]+/);
+const code = m ? m[0] : '';
+const el = id => document.getElementById(id);
+if (!code) {
+  el('title').textContent = '물방울 정원';
+  el('desc').textContent = '리플레이 코드가 없는 링크예요.';
+  el('copy').style.display = 'none'; el('help').style.display = 'none';
+  el('open').href = STORE; el('open').textContent = '물방울 정원 받기';
+} else {
+  try {
+    const b = code.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const o = JSON.parse(decodeURIComponent(escape(atob(b + '==='.slice((b.length + 3) % 4)))));
+    if (o.l) el('title').textContent = `${o.l}단계 ${o.h != null ? '명장면' : '리플레이'}`;
+  } catch (e) {}
+  el('code').textContent = code;
+  // 안드로이드: 앱이 있으면 앱으로, 없으면 스토어로
+  el('open').href = /Android/i.test(navigator.userAgent)
+    ? `intent://r/${code}#Intent;scheme=wgarden;package=${PKG};S.browser_fallback_url=${encodeURIComponent(STORE)};end`
+    : STORE;
+  el('copy').onclick = async () => {
+    try { await navigator.clipboard.writeText(code); el('copy').textContent = '복사했어요!'; }
+    catch (e) { const r = document.createRange(); r.selectNodeContents(el('code')); getSelection().removeAllRanges(); getSelection().addRange(r); el('copy').textContent = '코드를 길게 눌러 복사하세요'; }
+  };
+}
+</script>
+</body>
+</html>
