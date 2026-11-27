@@ -50,9 +50,20 @@ if (!code) {
   el('open').href = STORE; el('open').textContent = '물방울 정원 받기';
 } else {
   try {
-    const b = code.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-    const o = JSON.parse(decodeURIComponent(escape(atob(b + '==='.slice((b.length + 3) % 4)))));
-    if (o.l) el('title').textContent = `${o.l}단계 ${o.h != null ? '명장면' : '리플레이'}`;
+    const p = code.split('.')[1], b = p.replace(/-/g, '+').replace(/_/g, '/'), raw = atob(b + '==='.slice((b.length + 3) % 4));
+    let o;
+    if (p.startsWith('ey')) o = JSON.parse(decodeURIComponent(escape(raw)));
+    else {
+      // 2형식(바이트): 0xF1, 기록 버전, 단계 … 순서. 제목에 쓸 단계와 명장면 여부만 읽는다
+      let i = 1; const vu = () => { let n = 0, m = 1, x; do { x = raw.charCodeAt(i++); n += (x & 127) * m; m *= 128 } while (x & 128); return n };
+      vu(); const l = vu(); vu(); vu(); vu(); const fl = raw.charCodeAt(i++);
+      if (fl & 1) { vu(); vu(); vu(); vu() } if (fl & 2) { vu(); vu() }
+      let n = '';
+      if (fl & 4) { const ln = vu(); n = new TextDecoder().decode(Uint8Array.from(raw.slice(i, i + ln), c => c.charCodeAt(0))) }
+      o = { l, h: fl & 2 ? 0 : null, n };
+    }
+    // 별명은 글자로만 넣는다 (textContent)
+    if (o.l) el('title').textContent = `${o.n ? o.n + '님의 ' : ''}${o.l}단계 ${o.h != null ? '명장면' : '리플레이'}`;
   } catch (e) {}
   el('code').textContent = code;
   // 안드로이드: 앱이 있으면 앱으로, 없으면 스토어로
